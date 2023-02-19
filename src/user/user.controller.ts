@@ -4,11 +4,14 @@ import {UserLoginDTO} from './dto/user.login.dto'
 import { UserEntity } from '../entities/user.entity';
 
 @Controller('user')
+
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(
+    private readonly userService: UserService,
+    ) { }
 
   @Get('list')
-  findAll(): Promise<UserEntity[]> {
+  findAll(): Promise<object> {
     return this.userService.findAll();
   }
   @Post('login')
@@ -18,6 +21,7 @@ export class UserController {
   @Post('signUp')
   signUp(@Body() body: UserLoginDTO) {
     console.log(body)
+    
     return this.userService.signUp(body)
   }
 }

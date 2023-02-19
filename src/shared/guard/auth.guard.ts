@@ -1,9 +1,37 @@
-import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { CanActivate, Controller, ExecutionContext, HttpException, HttpStatus, Injectable, Module } from "@nestjs/common";
+import { InjectRepository, TypeOrmModule } from "@nestjs/typeorm";
+import { UserEntity } from "src/entities/user.entity";
+import { Connection, Repository } from "typeorm";
+
+
+@Injectable()
+export class AutoService {
+  // 使用InjectRepository装饰器并引入Repository这样就可以使用typeorm的操作了
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) { }
+  
+ async QueryToken(token: string) :Promise<boolean> {
+  const user = await this.userRepository.findOne({where:{auto: token}})
+    console.log(user)
+    return false
+ }
+}
+
+
+
+
+
+
 
 
 
 @Injectable()
-export class AutoGuard  implements CanActivate   {
+export class AutoGuard implements CanActivate   {
+  
+  
+  
   async canActivate(context: ExecutionContext): Promise<boolean> {
     console.log('进入全局权限守卫')
 
@@ -22,24 +50,41 @@ export class AutoGuard  implements CanActivate   {
       return true
     }
 
-    if(token) {
-      try {
-        // 还得做判断是否和数据库中保存的token一致
+    return true
+    // const autoService = new AutoService()
+    // console.log(autoService.QueryToken(token))
 
+    // if(token) {
+      
 
-        return true
-      }catch(e) {
-        throw new HttpException(
-          '没有授权访问， 请先登入',
-          HttpStatus.UNAUTHORIZED
-        )
-      }
-    }else {
-      throw new HttpException(
-        '没有授权访问， 请先登入',
-        HttpStatus.UNAUTHORIZED
-      )
-    }
+    //     // // 还得做判断是否和数据库中保存的token一致
+    //     if(token !== 'OjzTo2MtZ8duWQvrT7pQGo1LIYAr9MiGMOKI2fC3bIc=') {
+    //       throw new HttpException(
+    //         'Token已失, 请重新登入',
+    //         HttpStatus.UNAUTHORIZED
+    //       )
+         
+    //     }else {
+    //       return true
+    //     }
+    //     // const myDataSource = new DataSource({
+    //     //   type: 'mysql',
+    //     //   host: 'localhost',
+    //     //   port: 3306,
+    //     //   username: 'root',
+    //     //   password: '123456',
+    //     //   database: 'test'
+    //     // })
+    //     // const user = myDataSource.getRepository(UserEntity)
+    //     // const data = await user.findOne({where: {auto: token}})
+    //     // console.log(data)
+      
+    //   }else {
+    //   throw new HttpException(
+    //     '没有授权访问， 请先登入',
+    //     HttpStatus.UNAUTHORIZED
+    //   )
+    // }
   }
 
   private urlList:string[]  =[
